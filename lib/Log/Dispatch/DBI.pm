@@ -2,12 +2,10 @@ package Log::Dispatch::DBI;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.01';
+$VERSION = 0.02;
 
-require Log::Dispatch;
-
+use Log::Dispatch 2.00;
 use base qw(Log::Dispatch::Output);
-use fields qw(dbh sth table _mine);
 
 use DBI;
 
@@ -15,10 +13,7 @@ sub new {
     my($proto, %params) = @_;
     my $class = ref $proto || $proto;
 
-    my $self = do {
-	no strict 'refs';
-	bless [ \%{"$class\::FIELDS"} ], $class;
-    };
+    my $self = bless {}, $class;
     $self->_basic_init(%params);
     $self->_init(%params);
 
@@ -26,7 +21,7 @@ sub new {
 }
 
 sub _init {
-    my Log::Dispatch::DBI $self = shift;
+    my $self = shift;
     my %params = @_;
 
     # set parameters
@@ -43,7 +38,7 @@ sub _init {
 }
 
 sub create_statement {
-    my Log::Dispatch::DBI $self = shift;
+    my $self = shift;
     return $self->{dbh}->prepare(<<"SQL");
 INSERT INTO $self->{table} (level, message) VALUES (?, ?)
 SQL
@@ -51,13 +46,13 @@ SQL
 }
 
 sub log_message {
-    my Log::Dispatch::DBI $self = shift;
+    my $self = shift;
     my %params = @_;
     $self->{sth}->execute(@params{qw(level message)});
 }
 
 sub DESTROY {
-    my Log::Dispatch::DBI $self = shift;
+    my $self = shift;
     if ($self->{_mine} && $self->{dbh}) {
 	$self->{dbh}->disconnect;
     }

@@ -5,7 +5,7 @@ WriteMakefile(
     'PREREQ_PM' => {
 	Test::More => 0.32,
 	DBI => 0,
-	Log::Dispatch => 0,
+	Log::Dispatch => 2.0,
 	DBD::CSV => 0,		# for testing
 	File::Temp => 0.12,
     },
